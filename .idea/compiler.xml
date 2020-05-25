@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="spring-boot-admin-server" />
+        <module name="service-pri-server" />
+        <module name="cloud-zuul" />
+        <module name="cloud-config-server" />
+        <module name="cloud-turbine-dashboard" />
+        <module name="cloud-config-client" />
+        <module name="service-pri-api" />
+        <module name="service-abis-server" />
+        <module name="service-abis-api" />
+        <module name="cloud-eureka-server" />
+        <module name="cloud-gateway" />
+        <module name="cloud-hystrix-dashboard" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="8">
+      <module name="cloud-zipkin-server" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="cloud-config-client" options="-parameters" />
+      <module name="cloud-config-server" options="-parameters" />
+      <module name="cloud-eureka-server" options="-parameters" />
+      <module name="cloud-gateway" options="-parameters" />
+      <module name="cloud-hystrix-dashboard" options="-parameters" />
+      <module name="cloud-turbine-dashboard" options="-parameters" />
+      <module name="cloud-zipkin-server" options="-parameters" />
+      <module name="cloud-zuul" options="-parameters" />
+      <module name="service-abis" options="-parameters" />
+      <module name="service-abis-api" options="-parameters" />
+      <module name="service-abis-server" options="-parameters" />
+      <module name="service-pri" options="-parameters" />
+      <module name="service-pri-api" options="-parameters" />
+      <module name="service-pri-server" options="-parameters" />
+      <module name="spring-boot-admin-server" options="-parameters" />
+      <module name="spring-cloud-sample" options="-parameters" />
+    </option>
+  </component>
+</project>

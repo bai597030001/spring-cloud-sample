@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: eureka-server
+server:
+  port: 8761
+eureka:
+  instance:
+    hostname: localhost
+    # 在多机器独立部署的情况下是没有问题的，配置 prefer-ip-address 为 ture，
+    # 代表发现服务时候优先按照 IP 去搜寻，对于多集群而言，可以保证尽快准确搜索到服务。
+    # 而对于单机部署来说，IP 地址都是相同的，这会导致其余注册中心出现在
+    # unavailable-replicas (不可用副本) 中。所以单机部署时候不建议开启这个
+    # 参数（默认值为 false），多机部署时候可以开启。
+    prefer-ip-address: false
+    lease-renewal-interval-in-seconds: 5 # heartbeat interval
+    lease-expiration-duration-in-seconds: 15 # offline timeout
+  client:
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+    register-with-eureka: true # 设置为 false,代表不向注册中心注册自己
+    fetch-registry: false #false表示自己端就是注册中心，我的职责就是维护服务实例，并不需要去检索服务
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+logging:
+  file: ${spring.application.name}.log
+  level:
+    root: info
+    com:
+      lj:
+        pri:
+          dao: debug
+

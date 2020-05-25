@@ -1,0 +1,15 @@
+server:
+  port: 10030
+
+spring:
+  application:
+    name: cloud-hystrix-dashboard
+
+logging:
+  file: ${spring.application.name}.log
+  level:
+    root: info
+    com:
+      lj:
+        pri:
+          dao: debug

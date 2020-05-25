@@ -1,0 +1,73 @@
+server:
+  port: 10020
+
+spring:
+  application:
+    name: cloud-gateway
+  redis:
+    host: host-application
+    port: 6379
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          # 是否与服务注册于发现组件进行结合，通过 serviceId 转发到具体的服务实例。默认为 false，设为 true 便开启通过服务中心的自动根据 serviceId 创建路由的功能。
+          enabled: true
+          # 如果需要小写serviceId,则配置 lower-case-service-id: true
+          # 注意: 不管小写大写,不能使用下划线,否则会报
+          lower-case-service-id: true
+      # 默认filters,用于配置公共的过滤逻辑
+      default-filters:
+        - name: Hystrix
+          args:
+            name: fallback
+            fallbackUri: forward:/fallback
+        # filter的名称，必须是RequestRateLimiter
+        - name: RequestRateLimiter
+          args:
+            # 允许用户每秒处理的请求个数
+            redis-rate-limiter.replenishRate: 1
+            # 令牌桶的容量，允许在一秒内完成的最大请求数
+            redis-rate-limiter.burstCapacity: 1
+            # 使用SpEL名称引用Bean，与配置类中的 KeyResolver 的bean的name相同
+            key-resolver: '#{@ipKeyResolver}'
+#      routes:
+#        - id: eureka-pri
+#          uri: lb://eureka-pri
+#          predicates:
+#            - Path=//eureka-pri/**
+#          filters:
+#            - name: Hystrix
+#              args:
+#                name: fallback
+#                fallbackUri: forward:/fallback
+      loadbalancer:
+        use404: true
+
+spring.cloud.loadbalancer.ribbon.enabled: true
+
+hystrix:
+  command: #用于控制HystrixCommand的行为
+    default:
+      execution:
+        isolation:
+          thread:
+            #配置HystrixCommand执行的超时时间，执行超过该时间会进行服务降级处理
+            timeoutInMilliseconds: 1000
+  threadpool.default:
+      #并发执行的最大线程数，默认10
+      coreSize: 200
+      #BlockingQueue的最大队列数，默认值-1
+      maxQueueSize: 1000
+      #即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝，默认值5
+      queueSizeRejectionThreshold: 800
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 10 #表示eureka client发送心跳给server端的频率
+    health-check-url-path: /actuator/health #健康检查页面的URL，相对路径，默认使用 HTTP 访问，如果需要使用 HTTPS则需要使用绝对路径配置
+
+  client:
+    registryFetchIntervalSeconds: 5 #表示eureka client间隔多久去拉取服务注册信息，默认为30秒
+    service-url:
+      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/ #服务注册中心地址

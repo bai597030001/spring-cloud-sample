@@ -1,0 +1,33 @@
+spring:
+  application.name: cloud-config-client
+  cloud:
+    config:
+      # uri: http://localhost:9000,http://localhost:9001
+      # uri: http://localhost:9000
+      fail-fast: true
+      enabled: true # 开启配置
+      profile: dev  #版本
+    # Kafka的服务端列表，默认localhost
+    stream.kafka.binder:
+      brokers: host-application
+      #Kafka服务端的默认端口，当brokers属性中没有配置端口信息时，就会使用这个默认端口，默认9092
+      defaultBrokerPort: 9092
+      defaultZkPort: 2181
+    bus:
+      # id: ${vcap.application.name:${spring.application.name:application}}:${vcap.application.instance_index:${spring.profiles.active:${local.server.port:${server.port:0}}}}:${vcap.application.instance_id:${random.value}}
+      refresh:
+        enabled: true
+    config.discovery:
+      # 开启远程配置中心自动查找，避免硬编码配置中心URL
+      enabled: true
+      service-id: cloud-config-server
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 10 #表示eureka client发送心跳给server端的频率
+    health-check-url-path: /actuator/health #健康检查页面的URL，相对路径，默认使用 HTTP 访问，如果需要使用 HTTPS则需要使用绝对路径配置
+
+  client:
+    registryFetchIntervalSeconds: 5 #表示eureka client间隔多久去拉取服务注册信息，默认为30秒
+    service-url:
+      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/ #服务注册中心地址
