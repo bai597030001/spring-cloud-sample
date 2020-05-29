@@ -1,8 +1,11 @@
-spring:
-  application:
-    name: eureka-server
-server:
-  port: 8761
+server.port: 8761
+
+logging:
+  file: ${spring.application.name}.log
+  level.com.example.cloudeurekaserver: info
+
+spring.application.name: eureka-server
+
 eureka:
   instance:
     hostname: localhost
@@ -15,26 +18,12 @@ eureka:
     lease-renewal-interval-in-seconds: 5 # heartbeat interval
     lease-expiration-duration-in-seconds: 15 # offline timeout
   client:
-    service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+    service-url.defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
     register-with-eureka: true # 设置为 false,代表不向注册中心注册自己
     fetch-registry: false #false表示自己端就是注册中心，我的职责就是维护服务实例，并不需要去检索服务
 
 management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: ALWAYS
+  endpoints.web.exposure.include: "*"
+  endpoint.health.show-details: ALWAYS
 
-logging:
-  file: ${spring.application.name}.log
-  level:
-    root: info
-    com:
-      lj:
-        pri:
-          dao: debug
 

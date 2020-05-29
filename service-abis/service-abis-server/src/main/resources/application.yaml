@@ -4,44 +4,8 @@ server:
 logging:
   file: ${spring.application.name}.log
   level:
-    org:
-      springframework:
-        web:
-          servlet:
-            DispatcherServlet: DEBUG
-    com:
-      lj:
-        pri:
-          dao: debug
-
-spring:
-  application:
-    name: service-abis-server
-  zipkin:
-    enabled: true
-    base-url: http://localhost:9411/
-    locator.discovery.enabled: true
-    service.name: service-abis-server
-    sender.type: WEB # kafka/rabbit/web
-  sleuth:
-    web.client.enabled: true
-    # 100%的概率将链路的数据上传给Zipkin Server，在默认的情况下，该值为0.1
-    sampler.probability: 1.0
-
-# management.endpoints.web.exposure.include='*'，代表开启全部监控
-# management.endpoint.health.show-details=always，health endpoint开启显示全部细节。默认情况下/actuator/health是公开的，但不显示细节。
-# management.endpoints.web.base-path=/monitor，启用指定的url地址访问根路径，默认路径为/actuator/*，开启则访问路径变为/monitor/*。
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  #      base-path: /monitor
-  endpoint:
-    health:
-      show-details: always
-    shutdown:
-      enabled: true
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    com.example.serviceabisserver: info
 
 eureka:
   instance:
@@ -50,25 +14,75 @@ eureka:
 
   client:
     registryFetchIntervalSeconds: 5 #表示eureka client间隔多久去拉取服务注册信息，默认为30秒
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
+    service-url.defaultZone: http://localhost:8761/eureka/
+
+spring:
+  application.name: service-abis-server
+  zipkin:
+    enabled: true
+    base-url: http://localhost:9411/
+    locator.discovery.enabled: true
+    service.name: service-abis-server
+    sender.type: web # kafka/rabbit/web
+  sleuth:
+    web.client.enabled: true
+    # 100%的概率将链路的数据上传给Zipkin Server，在默认的情况下，该值为0.1
+    sampler.probability: 1.0
 
 hystrix:
   command:
     default:
       execution:
         isolation:
-          thread:
-            timeoutInMilliseconds: 4000
-  metrics:
-    rollingStats:
-      timeInMilliseconds: 5000
-  circuitBreaker:
-    requestVolumeThreshold: 5
-    errorThresholdPercentage: 0.5
-    sleepWindowInMilliseconds: 5000
+          thread.timeoutInMilliseconds: 4000
+      # 熔断器
+      circuitBreaker:
+        # 确定断路器是否用于跟踪运行状况，以及在其断开时是否用于短路请求, 默认true
+        enabled: true
+        # 设置在一个窗口期内触发熔断的最小请求数, 当达到此数量的失败后，进行短路。默认值：20
+        requestVolumeThreshold: 1
+        # 设置触发熔断器后拒绝请求的时长；达到时长后关闭 circuit 。单位：毫秒，默认值：5000
+        sleepWindowInMilliseconds: 10000
+        # 设置错误率阀值(百分比)，大于该值，熔断器断开并启动对回退逻辑的短路请求(执行 fallback )
+        errorThresholdPercentage: 0.5
+        # 设置熔断器是否强制打开，如果设置为 true，则拒绝所有请求。默认值：false
+        forceOpen: false
+        # 设置熔断器是否强制关闭，如果设置为 true，则不管错误率的阀值，将允许所有请求。
+        forceClosed: false
+      # 指标
+      metrics:
+        rollingStats:
+          # 设置统计的时间窗口时长，这是Hystrix 为断路器使用和发布指标的时间(窗口期)。单位：毫秒，默认值：10000
+          # 一个窗口期会被分成多个 bucket，每个 bucket 都有 Success、Failure、Timeout、Rejection 指标
+          timeInMilliseconds: 10000
+          # 设置一个统计窗口期内被划分为 bucket 的数量。若窗口时长(timeInMilliseconds)= 10 000 毫秒 ，
+          # numBuckets= 10，那么一个 bucket 的时间为 1 秒。
+          # 必须符合 metrics.rollingStats.timeInMilliseconds % metrics.rollingStats.numBuckets == 0，否则会报错。默认值：10。
+          numBuckets: 10
+        rollingPercentile:
+          # 设置是否开启指标百分比的计算和跟踪，默认值：true
+          enabled: true
+          # 设置计算百分比的窗口时长，默认值：60000
+          timeInMilliseconds: 60000
+          # 设置 rollingPercentile 窗口时长被划分为 bucket 的数量。默认值：6
+          # 注意：必须满足 metrics.rollingPercentile.timeInMillisecond % metrics.rollingPercentile.numBuckets == 0，否则报异常。
+          numBuckets: 6
+          # 设置每个 bucket 保留的最大执行次数。 默认值：100
+          # 例如：如果 bucketSize = 100，一个 bucket 窗口期为 10秒，在此期间发生了 500 次收集指标，
+          # 则只记录 10 秒期间内最近的 100 次的指标。
+          # 如果增加此值，还将增加存储值所需的内存量，并增加排序列表进行百分位数计算所需的时间。
+          bucketSize: 100
+        # 设置执行计算成功和错误百分比的健康快照时影响断路器状态的时长，单位：毫秒，默认值：500
+        healthSnapshot.intervalInMilliseconds: 500
 
 # 在feign中启动hystrix
-feign:
-  hystrix:
-    enabled: true
+feign.hystrix.enabled: true
+
+# management.endpoints.web.exposure.include='*'，代表开启全部监控
+# management.endpoint.health.show-details=always，health endpoint开启显示全部细节。默认情况下/actuator/health是公开的，但不显示细节。
+# management.endpoints.web.base-path=/monitor，启用指定的url地址访问根路径，默认路径为/actuator/*，开启则访问路径变为/monitor/*。
+management:
+  endpoints.web.exposure.include: '*'
+  endpoint:
+    health.show-details: always
+    shutdown.enabled: true

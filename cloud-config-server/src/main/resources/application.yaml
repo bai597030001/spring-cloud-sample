@@ -1,45 +1,8 @@
-server:
-  port: 10010
-
-spring:
-  application.name: cloud-config-server
-  profiles:
-    #设置为本地启动的方式，而不是通过git
-    active: native
-  cloud:
-    config:
-      server:
-        # native.search-locations: file:/home/baijd/spring_cloud/cloud_config
-        # 配置文件所在目录，classpath（类路径）和（系统文件路径） file两种
-        native.search-locations: file:E:/temp
-        # native.search-locations: classpath:/config
-        # prefix: /config # set the prefix of Config Server Rest API
-    stream.kafka.binder:
-      brokers: host-application
-    bus:
-      # id: ${vcap.application.name:${spring.application.name:application}}:${vcap.application.instance_index:${spring.profiles.active:${local.server.port:${server.port:0}}}}:${vcap.application.instance_id:${random.value}}
-      trace:
-        enabled: true
-      refresh:
-        enabled: true
+server.port: 10010
 
 logging:
   file: ${spring.application.name}.log
-  level:
-    root: info
-    com:
-      lj:
-        pri:
-          dao: debug
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: ALWAYS
+  level.com.example.cloudconfigserver: info
 
 eureka:
   instance:
@@ -48,6 +11,27 @@ eureka:
 
   client:
     registryFetchIntervalSeconds: 5 #表示eureka client间隔多久去拉取服务注册信息，默认为30秒
-    service-url:
-      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/ #服务注册中心地址
+    service-url.defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/ #服务注册中心地址
 
+spring:
+  application:
+    name: cloud-config-server
+  #设置为本地启动的方式，而不是通过git
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        # 配置文件所在目录，classpath（类路径）和file（系统文件路径） 两种
+        native.search-locations: file:E:/temp
+        # native.search-locations: classpath:/config
+        # prefix: /config # set the prefix of Config Server Rest API
+    stream.kafka.binder.brokers: host-application
+    bus:
+      # id: ${vcap.application.name:${spring.application.name:application}}:${vcap.application.instance_index:${spring.profiles.active:${local.server.port:${server.port:0}}}}:${vcap.application.instance_id:${random.value}}
+      trace.enabled: true
+      refresh.enabled: true
+
+management:
+  endpoints.web.exposure.include: "*"
+  endpoint.health.show-details: ALWAYS

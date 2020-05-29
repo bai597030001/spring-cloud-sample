@@ -1,7 +1,7 @@
 package com.example.servicepriserver.controller;
 
 import com.example.serviceabisapi.service.AbisService;
-import com.example.servicepriapi.service.PriService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,9 +15,6 @@ import javax.annotation.Resource;
 public class PriController {
 
     @Resource
-    private PriService priService;
-
-    @Resource
     private AbisService abisService;
 
     /**
@@ -28,14 +25,37 @@ public class PriController {
     @Value("${server.port}")
     private String port ;
 
+    @HystrixCommand(fallbackMethod = "getHystrixFallback")
     @GetMapping("pri")
     public String getPri(@RequestParam(defaultValue = "1", value = "start") int start, @RequestParam(defaultValue = "1", value = "end") int end){
-        return "instance port is " + port + " was used. " + priService.getPri(start, end);
+        return "instance port is " + port + " was used. ";
     }
 
+    @HystrixCommand(fallbackMethod = "getHystrixFallback")
     @GetMapping("abis")
-    public String getA(@RequestParam(defaultValue = "1", value = "start") int start, @RequestParam(defaultValue = "1", value = "end") int end){
-        return "instance port is " + port + " was used. " + abisService.getAbis(start, end);
+    public String getAbis(@RequestParam(defaultValue = "1", value = "start") int start, @RequestParam(defaultValue = "1", value = "end") int end){
+        return abisService.getAbis(start, end);
     }
 
+    @HystrixCommand(fallbackMethod = "getHystrixFallback")
+    @GetMapping("timeout")
+    public String getTimeoutHystrix(){
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return "this api is time out.";
+    }
+
+    public String getHystrixFallback(){
+        String s = "该次调用触发了hystrix方法保护机制";
+        System.out.println(s);
+        return s;
+    }
+    public String getHystrixFallback(int start, int end){
+        String s = "该次调用触发了hystrix方法保护机制";
+        System.out.println(s);
+        return s;
+    }
 }

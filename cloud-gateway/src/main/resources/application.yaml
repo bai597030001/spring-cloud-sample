@@ -1,5 +1,14 @@
-server:
-  port: 10020
+server.port: 10020
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 10 #表示eureka client发送心跳给server端的频率
+    health-check-url-path: /actuator/health #健康检查页面的URL，相对路径，默认使用 HTTP 访问，如果需要使用 HTTPS则需要使用绝对路径配置
+
+  client:
+    registryFetchIntervalSeconds: 5 #表示eureka client间隔多久去拉取服务注册信息，默认为30秒
+    service-url:
+      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/ #服务注册中心地址
 
 spring:
   application:
@@ -8,6 +17,7 @@ spring:
     host: host-application
     port: 6379
   cloud:
+    loadbalancer.ribbon.enabled: true
     gateway:
       discovery:
         locator:
@@ -26,9 +36,9 @@ spring:
         - name: RequestRateLimiter
           args:
             # 允许用户每秒处理的请求个数
-            redis-rate-limiter.replenishRate: 1
+            redis-rate-limiter.replenishRate: 10
             # 令牌桶的容量，允许在一秒内完成的最大请求数
-            redis-rate-limiter.burstCapacity: 1
+            redis-rate-limiter.burstCapacity: 10
             # 使用SpEL名称引用Bean，与配置类中的 KeyResolver 的bean的name相同
             key-resolver: '#{@ipKeyResolver}'
 #      routes:
@@ -43,8 +53,6 @@ spring:
 #                fallbackUri: forward:/fallback
       loadbalancer:
         use404: true
-
-spring.cloud.loadbalancer.ribbon.enabled: true
 
 hystrix:
   command: #用于控制HystrixCommand的行为
@@ -61,13 +69,3 @@ hystrix:
       maxQueueSize: 1000
       #即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝，默认值5
       queueSizeRejectionThreshold: 800
-
-eureka:
-  instance:
-    leaseRenewalIntervalInSeconds: 10 #表示eureka client发送心跳给server端的频率
-    health-check-url-path: /actuator/health #健康检查页面的URL，相对路径，默认使用 HTTP 访问，如果需要使用 HTTPS则需要使用绝对路径配置
-
-  client:
-    registryFetchIntervalSeconds: 5 #表示eureka client间隔多久去拉取服务注册信息，默认为30秒
-    service-url:
-      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/ #服务注册中心地址

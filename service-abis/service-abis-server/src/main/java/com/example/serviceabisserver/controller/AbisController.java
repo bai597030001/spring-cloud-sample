@@ -1,11 +1,8 @@
 package com.example.serviceabisserver.controller;
 
-import com.example.serviceabisapi.service.AbisService;
 import com.example.servicepriapi.service.PriService;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,9 +13,6 @@ import javax.annotation.Resource;
 @RestController
 @CrossOrigin(allowCredentials = "true")
 public class AbisController {
-
-    @Resource
-    private AbisService abisService;
 
     @Resource
     private PriService priService;
@@ -34,13 +28,13 @@ public class AbisController {
     @HystrixCommand(fallbackMethod = "getHystrixFallback")
     @GetMapping("pri")
     public String getPri(@RequestParam(defaultValue = "1", value = "start") int start, @RequestParam(defaultValue = "1", value = "end") int end){
-        return "instance port is " + port + " was used. " + priService.getPri(start, end);
+        return priService.getPri(start, end);
     }
 
     @HystrixCommand(fallbackMethod = "getHystrixFallback")
     @GetMapping("abis")
-    public String getA(@RequestParam(defaultValue = "1", value = "start") int start, @RequestParam(defaultValue = "1", value = "end") int end){
-        return "instance port is " + port + " was used. " + abisService.getAbis(start, end);
+    public String getAbis(@RequestParam(defaultValue = "1", value = "start") int start, @RequestParam(defaultValue = "1", value = "end") int end){
+        return "instance port is " + port + " was used. ";
     }
 
     @HystrixCommand(fallbackMethod = "getHystrixFallback")

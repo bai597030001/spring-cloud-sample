@@ -1,33 +1,33 @@
 server:
   port: 10050
 
-spring:
-  application:
-    name: cloud-zuul
-  zipkin:
-    enabled: true
-    base-url: http://localhost:9411/
-    locator.discovery.enabled: true
-    service.name: cloud-zuul
-    sender.type: WEB # kafka/rabbit/web
-  sleuth:
-    web.client.enabled: true
-    # 100%的概率将链路的数据上传给Zipkin Server，在默认的情况下，该值为0.1
-    sampler.probability: 1.0
+logging:
+  file: ${spring.application.name}.log
+  level.com.example.cloudzuul: debug
 
 eureka:
   instance:
     leaseRenewalIntervalInSeconds: 10 #表示eureka client发送心跳给server端的频率
     health-check-url-path: /actuator/health #健康检查页面的URL，相对路径，默认使用 HTTP 访问，如果需要使用 HTTPS则需要使用绝对路径配置
-
   client:
     registryFetchIntervalSeconds: 5 #表示eureka client间隔多久去拉取服务注册信息，默认为30秒
-    service-url:
-      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/ #服务注册中心地址
+    service-url.defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/ #服务注册中心地址
 
-zuul:
-  #是否开启重试功能
-  retryable: true
+spring:
+  application.name: cloud-zuul
+  zipkin:
+    enabled: true
+    base-url: http://localhost:9411/
+    locator.discovery.enabled: true
+    service.name: cloud-zuul
+    sender.type: web # kafka/rabbit/web
+  sleuth:
+    web.client.enabled: true
+    # 100%的概率将链路的数据上传给Zipkin Server，在默认的情况下，该值为0.1
+    sampler.probability: 1.0
+
+#是否开启重试功能
+zuul.retryable: true
 
 ribbon:
   #服务请求连接超时时间（毫秒）
@@ -41,17 +41,12 @@ ribbon:
   # 所有请求都重试
   OkToRetryOnAllOperations: true
   # 基于配置文件形式配置服务负载均衡策略，也可以单独配置某一服务的负载均衡策略
-  # 注意: 也可以提供config配置类提供负载均衡bean -> 下属配置不生效 ？？？
+  # 注意: 也可以提供config配置类提供负载均衡bean -> 下面配置不生效，代查看
   NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
 
+#配置HystrixCommand执行的超时时间，执行超过该时间会进行服务降级处理
 hystrix:
-  command: #用于控制HystrixCommand的行为
-    default:
-      execution:
-        isolation:
-          thread:
-            #配置HystrixCommand执行的超时时间，执行超过该时间会进行服务降级处理
-            timeoutInMilliseconds: 12000
+  command.default.execution.isolation.thread.timeoutInMilliseconds: 12000
   threadpool:
     default:
       #并发执行的最大线程数，默认10
@@ -64,24 +59,9 @@ hystrix:
     use-separate-thread-pools: true
 
 management:
-  endpoints:
-    web:
-      exposure:
-        # 暴露xxx端点，如需暴露多个，用,分隔；如需暴露所有端点，用'*'
-        include: '*'
-  #      base-path: /monitor
+  # 暴露xxx端点，如需暴露多个，用,分隔；如需暴露所有端点，用'*'
+  endpoints.web.exposure.include: '*'
   endpoint:
-    health:
-      # 是否展示健康检查详情
-      show-details: always
-    shutdown:
-      enabled: true
+    health.show-details: always
+    shutdown.enabled: true
 
-logging:
-  file: ${spring.application.name}.log
-  level:
-    root: info
-    com:
-      lj:
-        pri:
-          dao: debug

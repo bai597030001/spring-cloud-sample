@@ -1,7 +1,7 @@
 package com.example.cloudzuul.config;
 
 import com.netflix.loadbalancer.IRule;
-import com.netflix.loadbalancer.RandomRule;
+import com.netflix.loadbalancer.RoundRobinRule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,10 +16,10 @@ public class RibbonConfiguration {
         //return new MyRoundRobinRule();// 我自定义为每台机器5次
 
         // Ribbon随机
-        return new RandomRule();
+        // return new RandomRule();
 
         // Ribbon默认的轮询
-        //return new RoundRobinRule();
+        return new RoundRobinRule();
 
         //会先过滤掉由于多次访问故障而处于断路器跳闸状态的服务，还有并发的连接数量超过阈值的服务。然后对剩余的服务列表按照轮询策略进行访问。
         //return new AvailabilityFilteringRule();
