@@ -3,7 +3,7 @@ server:
 
 logging:
   file: ${spring.application.name}.log
-  level.com.example.cloudzuul: debug
+  level.com.example.cloudzuul: info
 
 eureka:
   instance:

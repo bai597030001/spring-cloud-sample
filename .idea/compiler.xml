@@ -6,18 +6,23 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="cloud-gateway" />
-        <module name="service-pri-server" />
-        <module name="cloud-config-client" />
-        <module name="cloud-config-server" />
-        <module name="cloud-zuul" />
-        <module name="cloud-turbine-dashboard" />
-        <module name="service-pri-api" />
-        <module name="service-abis-server" />
-        <module name="service-abis-api" />
         <module name="cloud-eureka-server" />
+        <module name="cloud-zuul" />
+        <module name="cloud-config-server" />
+        <module name="cloud-config-client" />
+        <module name="cloud-turbine-dashboard" />
+        <module name="cloud-gateway" />
         <module name="spring-boot-admin-server" />
         <module name="cloud-hystrix-dashboard" />
+      </profile>
+      <profile name="Annotation profile for spring-cloud-sample" enabled="true">
+        <sourceOutputDir name="../target/generated-sources/annotations" />
+        <sourceTestOutputDir name="../target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="service-abis-api" />
+        <module name="service-abis-server" />
+        <module name="service-pri-api" />
+        <module name="service-pri-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="8">
